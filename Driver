@@ -1,0 +1,55 @@
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Driver {
+    public List<String> executeQuery(String query, String queryType) throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/notesdatabase"; 
+        String user = "root";
+        String password = "1234";
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<String> notes = new ArrayList<>();
+
+        try {
+            // 1. Get a connection to database
+            connection = DriverManager.getConnection(url, user, password);
+
+            // 2. Create a statement
+            statement = connection.createStatement();
+
+            // 3. Execute SQL query
+            if (queryType.equals("insert")){
+                statement.executeUpdate(query);
+            }
+
+            if (queryType.equals("select")){
+                resultSet = statement.executeQuery(query);
+
+                // 4. Process the result set
+                while (resultSet.next()) {
+                    notes.add(resultSet.getString("note"));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+
+            if (statement != null) {
+                statement.close();
+            }
+
+            if (connection != null) {
+                connection.close();
+            }
+        }
+        return notes;
+    }
+}
+
